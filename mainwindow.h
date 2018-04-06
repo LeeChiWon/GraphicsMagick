@@ -31,6 +31,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    QStringList LoadFiles;
 };
 
 #endif // MAINWINDOW_H

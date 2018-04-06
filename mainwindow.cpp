@@ -19,35 +19,39 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_LineEdit_LoadPath()
 {
-    QString FilePath=ui->lineEdit_LoadPath->text();
+    /*QString FilePath=ui->lineEdit_LoadPath->text();
     if(!FilePath.isEmpty())
     {
         QDesktopServices::openUrl(QUrl(FilePath.prepend("file:///")));
-    }
+    }*/
 }
 
 void MainWindow::on_LineEdit_SavePath()
 {
-    QString FilePath=ui->lineEdit_SavePath->text();
-    if(!FilePath.isEmpty())
+    //QString FilePath=ui->lineEdit_SavePath->text();
+    if(!ui->lineEdit_SavePath->text().isEmpty())
     {
-        QDesktopServices::openUrl(QUrl(FilePath.prepend("file:///")));
+        QDesktopServices::openUrl(QUrl(ui->lineEdit_SavePath->text().prepend("file:///")));
     }
 }
 
 
 void MainWindow::on_pushButton_Convert_clicked()
-{
+{    
     if(!ui->lineEdit_LoadPath->text().isEmpty() && !ui->lineEdit_SavePath->text().isEmpty())
     {
         switch (ui->comboBox_SelectMenu->currentIndex())
         {
         case MENU_TRANSPARENT:
             Image testImage;
-            testImage.read(ui->lineEdit_LoadPath->text().toStdString());
-            testImage.colorFuzz(2);
-            testImage.transparent(Color("rgb(65535,65535,65535"));
-            testImage.write(ui->lineEdit_SavePath->text().toStdString());
+            foreach(QString File,LoadFiles)
+            {
+                testImage.read(File.toStdString());
+                testImage.colorFuzz(2);
+                testImage.transparent(Color("rgb(65535,65535,65535"));
+                QFileInfo FileInfo(File);
+                testImage.write(ui->lineEdit_SavePath->text().toStdString()+"/transparent_"+FileInfo.fileName().toStdString());
+            }
             break;
         }
         QMessageBox::information(this,"Infomation","Image converted.");
@@ -56,10 +60,21 @@ void MainWindow::on_pushButton_Convert_clicked()
 
 void MainWindow::on_pushButton_Load_clicked()
 {
-    ui->lineEdit_LoadPath->setText(QFileDialog::getOpenFileName(this,"Load Image",NULL,"Image(*.jpg *.png *.bmp)"));
+    QStringList TextList;
+    LoadFiles=QFileDialog::getOpenFileNames(this,"Load Image",NULL,"Image(*.jpg *.png *.bmp)");
+    QString Text;
+
+    foreach(QString File,LoadFiles)
+    {
+        TextList=File.split("/");
+        Text.append(TextList.at(TextList.count()-1)+"; ");
+    }
+
+    //ui->lineEdit_LoadPath->setText(QFileDialog::getOpenFileName(this,"Load Image",NULL,"Image(*.jpg *.png *.bmp)"));
+    ui->lineEdit_LoadPath->setText(Text);
 }
 
 void MainWindow::on_pushButton_Save_clicked()
 {
-    ui->lineEdit_SavePath->setText(QFileDialog::getSaveFileName(this,"Save Image",NULL,"Image(*.jpg);;Image(*.png);;Image(*.bmp)"));
+    ui->lineEdit_SavePath->setText(QFileDialog::getExistingDirectory(this,"Save Directory",NULL,QFileDialog::ShowDirsOnly));
 }
